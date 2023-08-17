@@ -3,10 +3,8 @@ import re
 
 
 async def is_valid_url(url):
-    # Define the regex pattern to match the expected URL format
     pattern = r"https://3sual\.az/package/\d+"
 
-    # Use re.match to check if the URL matches the pattern from the beginning
     return re.match(pattern, url) is not None
 
 

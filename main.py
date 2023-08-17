@@ -40,8 +40,8 @@ async def sender(event):
     await event.respond("Baza yükləndi.")
     print(data.values())
     for key, value in data.items():
-        await event.respond(key)
         await cavab_changer(value)
+        await event.respond(key)
         if key in meyar:
             await meyar_changer(meyar[key])
         await sleep(10)
@@ -68,13 +68,13 @@ async def show_result(event):
     # Prepare a message showing all results: username, points, and responses
     result = ""
     for user in user_data:
-        result += f"Username: {user['username']}\nPoints: {user['points']}\nResponses: {', '.join(user['responses'])}\n\n"
+        result += f"Username: {user['username']}\nPoints: {user['points']}\nAnswers: {', '.join(user['responses'])}\n\n"
 
     await event.respond(result)
 
 @client.on(events.NewMessage())
 async def check(event: events.newmessage.NewMessage.Event):
-    if not event.is_private and await is_not_link(event.text):
+    if not event.is_private and not await is_valid_url(event.text):
         try:
             if event.text.lower() == cavab[7:].lower() or event.text in meyar:
                 user_data = []
@@ -98,13 +98,13 @@ async def check(event: events.newmessage.NewMessage.Event):
 
                     if existing_user:
                         # Check if the user has already given this response
-                        if event.text not in existing_user.get('responses', []):
+                        if event.text.lower() not in existing_user.get('responses', []):
                             # If the response is new for this user, increment their points by 1
                             existing_user['points'] = existing_user.get('points', 0) + 1
-                            existing_user.setdefault('responses', []).append(event.text)
+                            existing_user.setdefault('responses', []).append(event.text.lower())
                     else:
                         # If the user doesn't exist, add them with 1 point and the current response
-                        new_user = {"username": event_sender_username, "points": 1, "responses": [event.text]}
+                        new_user = {"username": event_sender_username, "points": 1, "responses": [event.text.lower()]}
                         user_data.append(new_user)
 
                     # Write the updated user_data to the JSON file
